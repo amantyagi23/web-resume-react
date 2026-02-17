@@ -30,6 +30,8 @@ const skillCategories = [
       { name: "SQL", level: 80 },
       { name: "Drizzle ORM", level: 78 },
       { name: "Database Design", level: 76 },
+      { name: "MongoDB", level: 86 },
+      { name: "Redis", level: 70 },
     ],
   },
   {
