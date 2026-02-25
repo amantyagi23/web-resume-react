@@ -4,7 +4,9 @@ import { Mail, MapPin, Send } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { sendMail } from "../services/mailjet";
+import { db } from "../lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -24,16 +26,22 @@ export default function Contact() {
     formState: { errors },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
+    mode: "onChange",
   });
 
   const onSubmit = async (data: ContactFormData) => {
     try {
       setLoading(true);
-      await sendMail(data);
-      alert("Message sent successfully!");
+      await addDoc(collection(db, "contacts"), {
+        ...data,
+        createdAt: serverTimestamp(),
+      });
+      toast.success("Message sent successfully!");
       reset();
     } catch (err) {
-      alert("Something went wrong");
+      console.log(err);
+
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -88,50 +96,55 @@ export default function Contact() {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
+              onSubmit={handleSubmit(onSubmit)}
             >
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                  <input
-                    {...register("name")}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-accent text-white"
-                    placeholder="John Doe"
-                  />
-                  {errors.name && (
-                    <p className="error">{errors.name.message}</p>
-                  )}
-                </div>
+              <div>
+                <input
+                  {...register("name")}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-accent text-white"
+                  placeholder="John Doe"
+                />
+                {errors.name && (
+                  <span className=" text-sm text-red-500">
+                    {errors.name.message}
+                  </span>
+                )}
+              </div>
 
-                <div>
-                  <input
-                    {...register("email")}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-accent text-white"
-                    placeholder="john@example.com"
-                  />
-                  {errors.email && (
-                    <p className="error">{errors.email.message}</p>
-                  )}
-                </div>
+              <div>
+                <input
+                  {...register("email")}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-accent text-white"
+                  placeholder="john@example.com"
+                />
+                {errors.email && (
+                  <span className=" text-sm text-red-500">
+                    {errors.email.message}
+                  </span>
+                )}
+              </div>
 
-                <div>
-                  <textarea
-                    {...register("message")}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-accent text-white"
-                    placeholder="Your message..."
-                  />
-                  {errors.message && (
-                    <p className="error">{errors.message.message}</p>
-                  )}
-                </div>
+              <div>
+                <textarea
+                  {...register("message")}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-accent text-white"
+                  placeholder="Your message..."
+                />
+                {errors.message && (
+                  <span className=" text-sm text-red-500">
+                    {errors.message.message}
+                  </span>
+                )}
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 bg-accent rounded-lg flex justify-center gap-2"
-                >
-                  <Send size={18} />
-                  {loading ? "Sending..." : "Send Message"}
-                </button>
-              </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-accent rounded-lg flex justify-center gap-2"
+              >
+                <Send size={18} />
+                {loading ? "Sending..." : "Send Message"}
+              </button>
             </motion.form>
           </div>
         </div>
