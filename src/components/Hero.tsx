@@ -255,7 +255,7 @@ export default function Hero() {
           transition={{ delay: 4, duration: 0.8 }}
         >
           {[
-            { number: "2+", label: "Years Experience" },
+            { number: "3+", label: "Years Experience" },
             { number: "5+", label: "Projects Completed" },
           ].map((stat, index) => (
             <motion.div
