@@ -80,7 +80,7 @@ export default function About() {
               </div>
             </div>
             <a
-              href="/amantyagiresume.pdf"
+              href="/AmanTyagiResume.pdf"
               download
               className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:border-accent hover:text-accent transition-colors"
             >
